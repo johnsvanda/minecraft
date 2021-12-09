@@ -18,7 +18,7 @@ class GameBoardTest {
     void testCreateNewGame() {
         // setup
         var grid = GameBoard.createNewGame();
-        var blockCube = BlockCube.generateBlockCube();
+        var blockCube = BlockCube.initBlockCube();
         // then
         assertNotNull(grid);
         assertNotNull(blockCube);

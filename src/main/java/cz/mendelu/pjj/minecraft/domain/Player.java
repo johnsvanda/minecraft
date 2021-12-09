@@ -1,66 +1,109 @@
 package cz.mendelu.pjj.minecraft.domain;
 
+import cz.mendelu.pjj.minecraft.domain.types.PlayerType;
+import cz.mendelu.pjj.minecraft.domain.types.WeaponType;
+
+import java.util.ArrayList;
+import java.util.Objects;
+
 public class Player {
 
+    Path position;
     Weapon[] weapons;
     int hearts;
-    Color color;
+    PlayerType playerType;
+    int xp;
+    final GamePlan gamePlan;
+    int points;
+    ArrayList<Block> blocks;
+    ArrayList<Action> actions;
 
+    public Path getPosition() {
+        return position;
+    }
 
+    public void setPosition(Path position) {
+        this.position = position;
+    }
 
-    Player(Color color) {
-        this.weapons = new Weapon[]{new Weapon(WeaponType.WOODEN_SWORD), new Weapon(WeaponType.STONE_SWORD), new Weapon(WeaponType.POTATOE), new Weapon(WeaponType.POTATOE), new Weapon(WeaponType.POTATOE)};
+    Player(PlayerType playerType) {
+        this.position = null;
+        this.weapons = this.initWeapons();
         this.hearts = 0;
-        this.color = color;
+        this.playerType = playerType;
+        this.xp = 0;
+        this.gamePlan = new GamePlan();
+        this.points = 0;
+        this.blocks = new ArrayList();
+    }
+
+    public PlayerType getColor() {
+        return playerType;
+    }
+
+    private Weapon[] initWeapons() {
+        return new Weapon[]{new Weapon(WeaponType.WOODEN_SWORD), new Weapon(WeaponType.STONE_SWORD), new Weapon(WeaponType.POTATOE), new Weapon(WeaponType.POTATOE), new Weapon(WeaponType.POTATOE)};
     }
 
     /**
-     * Vr√°t√≠ akce, kter√© m≈Ø≈æe hr√°ƒç v dan√Ω moment prov√©st
+     * Vr·tÌ akce, kterÈ m??e hr·? v dan˝ moment provÈst
      *
      * @author xsvanda1
      * @version etapa 2
      */
-    public Action[] getAvailableActions(){
+    public Action[] getAvailableActions() {
         throw new UnsupportedOperationException("Not implemented yet.");
     }
 
     /**
-     * Proveƒè akci
+     * Vr·tÌ karty, kterÈ se nach·zÌ v okolÌ hr·?e
      *
      * @author xsvanda1
      * @version etapa 2
      */
-    public void makeAction(Card targetCard){
+    public Action[] getNeighbourCards() {
         throw new UnsupportedOperationException("Not implemented yet.");
     }
 
     /**
-     * Hr√°ƒç si vezme 2 bloky z velk√© kostky a p≈ôid√° je do sv√©ho invent√°≈ôe
+     * Prove? akci
      *
      * @author xsvanda1
      * @version etapa 2
      */
-    public void takeTwoBlocks(){
+    public void makeAction(Card targetCard) {
         throw new UnsupportedOperationException("Not implemented yet.");
+
     }
 
     /**
-     * Za√∫toƒç√≠ na p≈ô√≠≈°eru
-     * @param target p≈ô√≠≈°era na kterou se √∫toƒç√≠*
-     * @throws CantFightException nesm√≠me √∫toƒçit na p≈ô√≠≈°ery co maj√≠ v√≠ce srd√≠ƒçek
-     * @return Loot vr√°t√≠ zku≈°enosti nebo body do hodnocen√≠
+     * Hr·? si vezme 2 bloky z velkÈ kostky a p?id· je do svÈho invent·?e
      *
      * @author xsvanda1
      * @version etapa 2
      */
-    public Loot fight(Monster target){
+    public void takeTwoBlocks() {
+        BlockCube cube = BlockCube.initBlockCube();
+        this.blocks.addAll(cube.removeTwoBlocks());
+    }
+
+    /**
+     * Za˙to?Ì na p?Ì?eru
+     *
+     * @param target p?Ì?era na kterou se ˙to?Ì*
+     * @return Loot vr·tÌ zku?enosti nebo body do hodnocenÌ
+     * @throws CantFightException nesmÌme ˙to?it na p?Ì?ery co majÌ vÌce srdÌ?ek
+     * @author xsvanda1
+     * @version etapa 2
+     */
+    public Loot fight(Monster target) {
         throw new UnsupportedOperationException("Not implemented yet.");
     }
 
     /**
      * Get a sum of players hearts (attack), usually used when fighting a monster
-     * @return Hearts vr√°t√≠ poƒçet srdc√≠
      *
+     * @return Hearts vr·tÌ po?et srdcÌ
      * @author xsvanda1
      * @version etapa 3
      */
@@ -68,5 +111,23 @@ public class Player {
         return this.hearts;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Player) {
+            Player b = (Player) obj;
+            return (this.playerType == b.playerType);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.getColor());
+    }
+
+    @Override
+    public String toString() {
+        return "Player " + this.getColor();
+    }
 
 }

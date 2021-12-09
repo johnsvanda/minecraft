@@ -1,16 +1,25 @@
 package cz.mendelu.pjj.minecraft.domain;
 
+import cz.mendelu.pjj.minecraft.domain.types.CardType;
+
 public class Card {
 
     //Every card can exist in two states either hidden or shown
-    //A set of sixty-four cards which are divided into sixteen stacks of four cards each. Half contain buildings, and the other half contain hostile mobs.
     boolean hidden;
-
-    Card(){
+    CardType cardType;
+    Card(CardType cardType){
         this.hidden  = true;
+        this.cardType = cardType;
     }
 
     public void showCard(){
         this.hidden = false;
+    }
+
+    @Override
+    public String toString() {
+        return "Card{" +
+                "hidden=" + hidden +
+                '}';
     }
 }

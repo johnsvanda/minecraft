@@ -1,27 +1,35 @@
 package cz.mendelu.pjj.minecraft.domain;
 
 
+import jdk.jshell.spi.ExecutionControl;
+
+import java.util.Stack;
+
 //A set of sixty-four cards which are divided into sixteen stacks of four cards each. Half contain buildings, and the other half contain hostile mobs.
 public class Tile {
-    Card[] cards;
+    Stack<Card> cards;
 
-    Tile() {
-        this.cards = new Card[4];
-        boolean even = true;
-        for (Card card : this.cards) {
-            card = even ? new Monster(0) : new Building();
-            even = !even;
+    Tile(Card [] cards) {
+        this.cards = new Stack<>();
+        for (Card card: cards
+             ) {
+            //System.out.println(card.getClass());
+            addCardToTile(card);
         }
+    }
+
+    private void addCardToTile(Card card) {
+        if (this.cards.size() < 5) this.cards.push(card);
+    }
+
+    private Card removeCardFromTile() {
+         return this.cards.pop();
     }
 
     public Card showCard(Card hiddenCard) {
         hiddenCard.showCard();
-        return  hiddenCard;
+        return hiddenCard;
     }
 
-    public Card removeCard(Card targetCard) {
-        Card removedCard = this.cards[cards.length];
-        this.cards[cards.length] = null;
-        return removedCard;
-    }
+
 }

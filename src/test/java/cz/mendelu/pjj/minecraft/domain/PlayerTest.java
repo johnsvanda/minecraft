@@ -1,5 +1,6 @@
 package cz.mendelu.pjj.minecraft.domain;
 
+import cz.mendelu.pjj.minecraft.domain.types.PlayerType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
@@ -10,7 +11,7 @@ class PlayerTest {
     @Test
     void getAvailableActions() {
         // setup
-        var player = new Player(Color.RED);
+        var player = new Player(PlayerType.RED);
         var actions = player.getAvailableActions();
 
         //then
@@ -24,8 +25,8 @@ class PlayerTest {
     @Test
     void takeTwoBlocks() {
         //setup
-        var cube = BlockCube.generateBlockCube();
-        var player = new Player(Color.RED);
+        var cube = BlockCube.initBlockCube();
+        var player = new Player(PlayerType.RED);
         var originalLength = cube.length;
 
         //when
@@ -38,7 +39,7 @@ class PlayerTest {
     @Test
     void fight() {
         //setup
-        var player = new Player(Color.RED);
+        var player = new Player(PlayerType.RED);
         var monster = new Monster(10);
 
         //when

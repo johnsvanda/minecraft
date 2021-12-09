@@ -1,27 +1,33 @@
 package cz.mendelu.pjj.minecraft.domain;
 
+import cz.mendelu.pjj.minecraft.domain.types.*;
+
+import java.util.Random;
+
 public class GameBoard {
 
 
     public static GameBoard instance;
-    private Card[][] grid;
+    private static Object[][] grid;
     private Player[] players;
+    private BlockCube cube;
 
     /**
+     * Init whole Game
      * Just one instance can be created
      */
     GameBoard() {
-        this.grid = new Card[11][11];
-        fillGridWithCards(this.grid);
-
+        this.grid = initGrid();
+        this.cube = BlockCube.initBlockCube();
+        this.players = initPlayers();
     }
 
     /**
-     * Vytvo≈ôen√≠ nov√© hry
-     * Um√≠st√≠ hr√°ƒçe do st≈ôedu matice
+     * Vytvo?enÌ novÈ hry
+     * UmÌstÌ hr·?e do st?edu matice
      * Design pattern Singleton
      *
-     * @return Hern√≠ matice
+     * @return HernÌ matice
      * @author xsvanda1
      * @version etapa 2
      */
@@ -33,9 +39,9 @@ public class GameBoard {
     }
 
     /**
-     * Zavol√° hodnocen√≠ a p≈ôiƒçte body hr√°ƒç≈Øm
+     * Zavol· hodnocenÌ a p?i?te body hr·??m
      *
-     * @param type, vyhodnot√≠ jak√° f√°ze hry se moment√°lnƒõ vyhodnocuje (3 hodnot√≠c√≠ f√°ze)
+     * @param type, vyhodnotÌ jak· f·ze hry se moment·ln? vyhodnocuje (3 hodnotÌcÌ f·ze)
      * @author xsvanda1
      * @version etapa 2
      */
@@ -44,17 +50,18 @@ public class GameBoard {
     }
 
     /**
-     * Z√≠sk√° pole a t√≠m i jeho obsah (karty)
+     * ZÌsk· pole a tÌm i jeho obsah (karty)
      *
-     * @param x, ƒç√≠slice v rozsahu 0-11
+     * @param x, ?Ìslice v rozsahu 0-11
      * @param y, 0-11
-     * @return Existuj√≠c√≠ pol√≠ƒçko
-     * @throws IndexOutOfBoundsException je dotazov√°no mimo rozsah
+     * @return ExistujÌcÌ polÌ?ko
+     * @throws IndexOutOfBoundsException
+     * fBoundsException je dotazov·no mimo rozsah
      * @author xsvanda1
      * @version etapa 2
      */
-    public static Tile getTile(int x, int y) {
-        throw new UnsupportedOperationException("Not implemented yet.");
+    public static Object getTile(int x, int y) {
+        return grid[x][y];
     }
 
     /**
@@ -66,39 +73,50 @@ public class GameBoard {
      * @author xsvanda1
      * @version etapa 2
      */
-    private void fillGridWithCards(Card[][] grid) {
+    private Object[][] initGrid() {
+        grid = new Object[11][11];
 
-
-        //Fill grid with buildings and monsters
-        for (int i = 2; i <= 8; i += 2) {
-            for (int j = 2; j <= 8; j += 2) {
-                if (i == 4 || i == 6) grid[i][j] = new Monster(10);
-                else grid[i][j] = new Building();
-
+        //Fill grid with weapons
+        Tile tile = this.createTileWithCards(CardType.WEAPON);
+        int add;
+        int stop;
+        for (int i = 0; i <= 10; i += 2) {
+            if (i == 0 || i == 10) {
+                add = 2;
+                stop = 8;
+            }
+            else {
+                add = 2;
+                stop = 10;
+            }
+            for (int j = add; j <= stop; j += add) {
+                if(add == 2 && stop == 10) add = 8;
+                grid[i][j] = tile;
             }
         }
 
-        //Fill grid with weapons
-        int add;
-        for (int i = 0; i <= 10; i += 2) {
-            if (i == 0 || i == 10) add = 2;
-            else add = 10;
-
-            for (int j = 0; j <= 10; j += add) {
-                grid[i][j] = new Weapon(WeaponType.WOODEN_SWORD);
+        //Fill grid with buildings and monsters
+        tile = this.createTileWithCards(CardType.BUILDING_MONSTER);
+        for (int i = 2; i <= 8; i += 2) {
+            for (int j = 2; j <= 8; j += 2) {
+                grid[i][j] = tile;
             }
         }
 
         //Fill grid with paths
-        int begin;
+        Path path = new Path();
         for (int i = 1; i <= 9; i += 2) {
-            if (i == 1 || i == 9) begin  =  3;
-            else begin = 1;
+            if (i == 1 || i == 9) add = 3;
+            else add = 1;
 
-            for (int j = begin; j <= 10; j += 2) {
-                grid[i][j] = new Path();
+            for (int j = add; j <= 7; j += 2) {
+                grid[i][j] = path;
+                //System.out.println("[" + i + "]" + "[" + j + "]");
             }
         }
+
+
+        return grid;
     }
 
     /**
@@ -108,13 +126,52 @@ public class GameBoard {
      * @author xsvanda1
      * @version etapa 2
      */
-    private Tile generateTile() {
-        Tile tile = new Tile();
-        return tile;
+    private Tile createTileWithCards(CardType cardType) {
+        Card randomCard = null;
+        switch (cardType) {
+
+            case WEAPON:
+                randomCard = new Weapon(new Random().nextInt(WeaponType.values().length));
+                break;
+
+            case BUILDING_MONSTER:
+
+                //random to mix buildings 0 and monsters 1 in the same tile
+                int random = new Random().nextInt(2);
+                if (random == 1)
+                    randomCard = new Monster(new Random().nextInt(MonsterType.values().length));
+                else randomCard = new Building(new Random().nextInt(BuildingType.values().length));
+                break;
+        }
+
+        return new Tile(returnFourCards(randomCard));
+    }
+
+    private Card[] returnFourCards(Card card) {
+        return new Card[]{card, card, card, card};
+    }
+
+    private Player[] initPlayers() {
+
+        // Game is for 2-4 players
+        Player[] players = new Player[4];
+
+
+        // Get starting field
+        Path path = (Path) getTile(5,5);
+
+        // Create players
+        for (int i = 0; i < players.length; i++) {
+            Player player = new Player(PlayerType.RED);
+            path.setPlayer(player);
+        }
+        return players;
     }
 
     public static void main(String[] args) {
-        GameBoard game = GameBoard.createNewGame();
+        GameBoard game = createNewGame();
+
+
     }
 
 }
