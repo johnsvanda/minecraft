@@ -1,6 +1,7 @@
 package cz.mendelu.pjj.minecraft.domain;
 
 import cz.mendelu.pjj.minecraft.domain.types.BlockType;
+import cz.mendelu.pjj.minecraft.greenfoot.MinecraftWorld;
 
 import java.util.*;
 
@@ -12,6 +13,7 @@ public class BlockCube {
     BlockCube() {
         instance = null;
         blocks = new ArrayList();
+        fillTheCube();
     }
 
     /**
@@ -28,13 +30,12 @@ public class BlockCube {
 
     }
 
-    private static void fillTheCube(BlockCube cube) {
-        blocks = cube.blocks;
+    private static void fillTheCube() {
 
-        addMultipleBlocks(blocks, 16, BlockType.WOOD);
-        addMultipleBlocks(blocks, 12, BlockType.STONE);
+        addMultipleBlocks(blocks, 22, BlockType.WOOD);
+        addMultipleBlocks(blocks, 14, BlockType.STONE);
         addMultipleBlocks(blocks, 14, BlockType.SAND);
-        addMultipleBlocks(blocks, 12, BlockType.OBSIDIAN);
+        addMultipleBlocks(blocks, 4, BlockType.OBSIDIAN);
         addMultipleBlocks(blocks, 10, BlockType.EMERALD);
         Collections.shuffle(blocks);
     }
@@ -51,36 +52,46 @@ public class BlockCube {
     }
 
     public ArrayList<Block> removeTwoBlocks() {
-
-
+        System.out.println(this.numberOfBlocks());
         ArrayList<Block> removedBlocks = new ArrayList();
 
         //We will be always removing two block at once
         for (int i = 0; i < 2; i++) {
-            Block deletedBlock = this.blocks.remove(instance.blocks.size());
+            Block deletedBlock = this.blocks.remove(instance.blocks.size()-1);
             removedBlocks.add(deletedBlock);
         }
-
-        this.checkIfEvaluation();
 
         return removedBlocks;
     }
 
-    private void checkIfEvaluation() {
+    public void checkIfEvaluation(Game game) {
         if (this.numberOfBlocks() == 48) {
             //Call first evaluation
+            System.out.println("First evaluation");
         }
         if (this.numberOfBlocks() == 32) {
             //Call second evaluation
         }
         if (this.numberOfBlocks() == 16) {
-            //Call third evaluation
+            System.out.println("Third evaluation");
+
+            int maxXp = 0;
+            Player maxXpPlayer = null;
+            for (Player player :
+                    game.getPlayers()) {
+                if(player.getXp() > maxXp) {
+                    maxXp = player.getXp();
+                    maxXpPlayer = player;
+                }
+            }
+
+            System.out.println("Winner is:" + maxXpPlayer.getPlayerType());
         }
     }
 
     public static void main(String[] args) {
         BlockCube cube = initBlockCube();
-        fillTheCube(cube);
+        fillTheCube();
 
         for (Block block : cube.blocks
         ) {

@@ -5,12 +5,12 @@ public class Path  {
 
     Player player;
 
-    Path() {
+    public Path() {
         this.player = null;
     }
 
     public void setPlayer(Player player) {
-        player.setPosition(this);
+        //player.setPosition(this);
         this.player = player;
     }
 

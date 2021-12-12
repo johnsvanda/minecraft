@@ -1,23 +1,33 @@
 package cz.mendelu.pjj.minecraft.domain;
 
-import cz.mendelu.pjj.minecraft.domain.types.CardType;
 import cz.mendelu.pjj.minecraft.domain.types.MonsterType;
 
 public class Monster extends Card {
-    public Monster(int monsterTypeValue) {
-        super(CardType.MONSTER);
-        MonsterType monsterType = MonsterType.valueOf(monsterTypeValue);
-        initMonster(monsterType);
-    }
-    int hearts;
-    int xp;
-    boolean addCards;
-    boolean addPoints;
 
+    public Monster(int monsterTypeValue) {
+        initMonster(MonsterType.valueOf(monsterTypeValue));
+    }
+
+    private int hearts;
+    private int xp;
+
+    public int getXp() {
+        return xp;
+    }
+
+    public boolean isAddAction() {
+        return addAction;
+    }
+
+    public boolean isAddPoints() {
+        return addPoints;
+    }
+
+    private boolean addAction;
+    private boolean addPoints;
 
 
     public Monster(MonsterType MonsterType) {
-        super(CardType.MONSTER);
         initMonster(MonsterType);
     }
 
@@ -26,29 +36,32 @@ public class Monster extends Card {
             case ZOMBIE:
                 this.hearts = 2;
                 this.xp = 3;
-                this.addCards = true;
+                this.addAction = true;
                 this.addPoints = false;
-
+                super.setCardType(MonsterType.ZOMBIE);
                 break;
             case SKELETON:
                 this.hearts = 3;
                 this.xp = 4;
-                this.addCards = true;
+                this.addAction = true;
                 this.addPoints = false;
+                super.setCardType(MonsterType.SKELETON);
                 break;
 
             case CREEPER:
                 this.hearts = 4;
                 this.xp = 5;
-                this.addCards = true;
+                this.addAction = true;
                 this.addPoints = false;
+                super.setCardType(MonsterType.CREEPER);
                 break;
 
             case WITCH:
                 this.hearts = 5;
                 this.xp = 5;
-                this.addCards = false;
+                this.addAction = false;
                 this.addPoints = true;
+                super.setCardType(MonsterType.WITCH);
                 break;
         }
     }
@@ -57,15 +70,4 @@ public class Monster extends Card {
         return hearts;
     }
 
-    public int getXp() {
-        return xp;
-    }
-
-    public boolean isAddCards() {
-        return addCards;
-    }
-
-    public boolean isAddPoints() {
-        return addPoints;
-    }
 }

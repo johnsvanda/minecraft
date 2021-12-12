@@ -3,78 +3,116 @@ package cz.mendelu.pjj.minecraft.domain;
 import cz.mendelu.pjj.minecraft.domain.types.PlayerType;
 import cz.mendelu.pjj.minecraft.domain.types.WeaponType;
 
-import java.util.ArrayList;
-import java.util.Objects;
+import java.util.*;
 
 public class Player {
 
     Path position;
-    Weapon[] weapons;
+    ArrayList<Weapon> weapons;
     int hearts;
     PlayerType playerType;
     int xp;
     final GamePlan gamePlan;
     int points;
-    ArrayList<Block> blocks;
-    ArrayList<Action> actions;
+    ArrayList<Action> availableActions = new ArrayList<>();
+    private int numberOfAvailabeActions;
+    private List inHand = new ArrayList();
 
-    public Path getPosition() {
-        return position;
+    public void setXp(int xp) {
+        this.xp += xp;
+    }
+    public void setPoints(int points) {
+        this.points += points;
     }
 
-    public void setPosition(Path position) {
-        this.position = position;
+
+    public List getInHand() {
+        return inHand;
     }
 
-    Player(PlayerType playerType) {
-        this.position = null;
-        this.weapons = this.initWeapons();
+    public void setInHand(Card... inHand) {
+        this.inHand.addAll(Arrays.asList(inHand));
+    }
+
+    public void addWeapon(Weapon weapon) {
+        this.weapons.add(weapon);
+    }
+
+    public PlayerType getPlayerType() {
+        return playerType;
+    }
+
+
+    public int getNumberOfAvailabeActions() {
+        return numberOfAvailabeActions;
+    }
+
+    public int getXp() {
+        return xp;
+    }
+
+    public int getPoints() {
+        return points;
+    }
+
+    public void setNumberOfAvailabeActions(int numberOfAvailabeActions) {
+        this.numberOfAvailabeActions += numberOfAvailabeActions;
+    }
+
+
+
+    public Player(PlayerType playerType) {
+        this.weapons = new ArrayList<>(Arrays.asList(new Weapon(WeaponType.WOODEN_SWORD), new Weapon(WeaponType.STONE_SWORD), new Weapon(WeaponType.POTATOE), new Weapon(WeaponType.POTATOE), new Weapon(WeaponType.POTATOE)));
         this.hearts = 0;
         this.playerType = playerType;
         this.xp = 0;
         this.gamePlan = new GamePlan();
         this.points = 0;
-        this.blocks = new ArrayList();
+        this.availableActions.addAll(List.of(new Action[]{new TakeTwoBlocks()}));
+        this.inHand.addAll(this.weapons);
+        this.numberOfAvailabeActions = 0;
+    }
+
+    public void decrementNumberofAvailableActions() {
+        this.numberOfAvailabeActions--;
+    }
+
+    public List inHand() {
+        return inHand;
     }
 
     public PlayerType getColor() {
         return playerType;
     }
 
-    private Weapon[] initWeapons() {
-        return new Weapon[]{new Weapon(WeaponType.WOODEN_SWORD), new Weapon(WeaponType.STONE_SWORD), new Weapon(WeaponType.POTATOE), new Weapon(WeaponType.POTATOE), new Weapon(WeaponType.POTATOE)};
-    }
 
+    public boolean build(Building buildingToBuild) {
+        Block[] recipe = buildingToBuild.getBlocks();
+        boolean eligibleForBuild = this.inHand.containsAll(List.of(recipe));
+
+        System.out.println(eligibleForBuild);
+
+
+        if(eligibleForBuild) {
+            this.inHand.removeAll(List.of(recipe));
+            this.setXp(buildingToBuild.getXp());
+        };
+
+        return eligibleForBuild;
+    }
     /**
      * Vrátí akce, které m??e hrá? v daný moment provést
      *
+     * @return
      * @author xsvanda1
      * @version etapa 2
      */
-    public Action[] getAvailableActions() {
-        throw new UnsupportedOperationException("Not implemented yet.");
+    public ArrayList<Action> getAvailableActions() {
+        //TODO definovat podmínky kdy m??e a kdy nem??e vykonávat které akce
+        return this.availableActions;
     }
 
-    /**
-     * Vrátí karty, které se nachází v okolí hrá?e
-     *
-     * @author xsvanda1
-     * @version etapa 2
-     */
-    public Action[] getNeighbourCards() {
-        throw new UnsupportedOperationException("Not implemented yet.");
-    }
 
-    /**
-     * Prove? akci
-     *
-     * @author xsvanda1
-     * @version etapa 2
-     */
-    public void makeAction(Card targetCard) {
-        throw new UnsupportedOperationException("Not implemented yet.");
-
-    }
 
     /**
      * Hrá? si vezme 2 bloky z velké kostky a p?idá je do svého inventá?e
@@ -84,20 +122,42 @@ public class Player {
      */
     public void takeTwoBlocks() {
         BlockCube cube = BlockCube.initBlockCube();
-        this.blocks.addAll(cube.removeTwoBlocks());
+        this.inHand.addAll(cube.removeTwoBlocks());
     }
 
     /**
      * Zaúto?í na p?í?eru
      *
      * @param target p?í?era na kterou se úto?í*
-     * @return Loot vrátí zku?enosti nebo body do hodnocení
+     * @return Player's hearts (damage) in the fight
      * @throws CantFightException nesmíme úto?it na p?í?ery co mají více srdí?ek
      * @author xsvanda1
      * @version etapa 2
      */
-    public Loot fight(Monster target) {
-        throw new UnsupportedOperationException("Not implemented yet.");
+    public int fight(Monster target) {
+        int playerHearts = this.getHearts();
+        int monsterHearts = target.getHearts();
+
+        // Case kill monster
+        if (playerHearts >= monsterHearts) {
+            this.setXp(target.getXp());
+            if (target.isAddAction()) {
+                this.setNumberOfAvailabeActions(1);
+                System.out.println("Add actions");
+                //TODO remove top card
+
+            }
+            if (target.isAddPoints()) {
+                this.setPoints(2);
+            }
+
+        } else {
+            // Case didn't kill monster
+            // Just loose one action
+            System.out.println("Player can't fight");
+        }
+        this.decrementNumberofAvailableActions();
+        return playerHearts;
     }
 
     /**
@@ -108,7 +168,14 @@ public class Player {
      * @version etapa 3
      */
     public int getHearts() {
-        return this.hearts;
+
+        int sumHearts = 0;
+        Collections.shuffle(this.weapons);
+        for (int i = 0; i < 3; i++) {
+            sumHearts += this.weapons.get(i).getHearts();
+        }
+
+        return sumHearts;
     }
 
     @Override
@@ -127,7 +194,7 @@ public class Player {
 
     @Override
     public String toString() {
-        return "Player " + this.getColor();
+        return "" + this.getColor();
     }
 
 }

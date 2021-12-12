@@ -30,6 +30,18 @@ public enum MonsterType {
         return value;
     }
 
+    public static MonsterType[] getValues() {
+        return MonsterType.values();
+    }
+
+    public static boolean isMonster(MonsterType cardType){
+        boolean result = false;
+        for(MonsterType monsterType: MonsterType.values()){
+            if(monsterType == cardType) result = true;
+        }
+        return result;
+    }
+
     public static void main(String[] args) {
         for(MonsterType MonsterType: MonsterType.values()){
             System.out.println(MonsterType.getValue());

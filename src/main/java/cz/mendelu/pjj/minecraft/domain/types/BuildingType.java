@@ -21,6 +21,10 @@ public enum BuildingType {
         }
     }
 
+    public static BuildingType[] getValues() {
+        return BuildingType.values();
+    }
+
     public static BuildingType valueOf(int BuildingType) {
         return (BuildingType) map.get(BuildingType);
     }

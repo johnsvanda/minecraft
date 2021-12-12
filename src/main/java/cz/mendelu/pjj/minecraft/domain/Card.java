@@ -2,13 +2,26 @@ package cz.mendelu.pjj.minecraft.domain;
 
 import cz.mendelu.pjj.minecraft.domain.types.CardType;
 
-public class Card {
+abstract public class Card<C> {
 
-    //Every card can exist in two states either hidden or shown
-    boolean hidden;
-    CardType cardType;
-    Card(CardType cardType){
+    private C cardType;
+
+     //Every card can exist in two states either hidden or shown
+    private boolean hidden;
+
+    Card(){
         this.hidden  = true;
+    }
+
+    public boolean isHidden() {
+        return hidden;
+    }
+
+    public C getCardType() {
+        return this.cardType;
+    }
+
+    public void setCardType(C cardType) {
         this.cardType = cardType;
     }
 
@@ -18,8 +31,7 @@ public class Card {
 
     @Override
     public String toString() {
-        return "Card{" +
-                "hidden=" + hidden +
-                '}';
+        return "" + this.cardType;
     }
+
 }
